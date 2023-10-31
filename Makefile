@@ -8,9 +8,10 @@ CC=i686-elf-gcc
 all: $(BUILDDIR)/$(TARGET) clean
 
 $(BUILDDIR)/$(TARGET): $(BUILDDIR)/bootloader.bin
-	dd if=/dev/zero of=$(BUILDDIR)/$(TARGET) bs=512 count=5734
+	dd if=/dev/zero of=$(BUILDDIR)/$(TARGET) bs=512 count=5900
 	mkfs.fat -s 1 -S 512 -F 16 $(BUILDDIR)/$(TARGET)
 	dd if=$(BUILDDIR)/bootloader.bin of=$(BUILDDIR)/$(TARGET) conv=notrunc
+	mcopy -i $(BUILDDIR)/$(TARGET) kernel/kernel.bin "::kernel.bin"
 
 $(BUILDDIR)/bootloader.bin: $(PROJDIR)/boot/boot.asm
 	$(ASM) -f bin $(PROJDIR)/boot/boot.asm -o $(BUILDDIR)/bootloader.bin
