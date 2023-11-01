@@ -148,7 +148,7 @@ _start:
     mov ax, [bx]
     pop bx
 
-    cmp ax, 0xFFFE      ; i hecked this shit aga
+    cmp ax, 0xFFFE     
     jg .loaded
     
     jmp .load_kernel_loop
@@ -157,6 +157,7 @@ _start:
     mov dx, kernel_load_segment
     mov es, dx
     mov ds, dx
+
 
     jmp kernel_load_segment:kernel_load_offset
 
@@ -240,7 +241,7 @@ error_msg:  db "There was an error. Check your drive and press a key to reboot."
 sys_files: db "KERNEL  BIN"
 previous_cluster: dw 0x0000
 
-kernel_load_segment equ 0x1000
-kernel_load_offset  equ 0x0000
+kernel_load_segment equ 0x2000
+kernel_load_offset  equ 0
 times 510 - ($ - $$) db 0x00
 dw 0xaa55
