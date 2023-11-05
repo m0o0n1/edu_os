@@ -1,12 +1,11 @@
-all: kernel.o stdio.o x86_video.obj kernel.obj
-	../../cross-compile/cross/bin/i686-elf-gcc -T linker.ld -o kernel.bin -ffreestanding -O2 -nostdlib kernel.o stdio.o x86_video.obj -lgcc kernel.obj
+all: kernel.o kernel_asm.o
+	../../cross-compile/cross/bin/i686-elf-ld -T linker.ld -o kernel.bin -nostdlib kernel.o kernel_asm.o
 
 %.o:%.c
-	../../cross-compile/cross/bin/i686-elf-gcc -c $< -o $@ -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-
-%.obj:%.asm
-	nasm -felf32 -w+gnu-elf-extensions $< -o $@
+	../../cross-compile/cross/bin/i686-elf-gcc -c $< -ffreestanding -O2 -Wall -Wextra
+%.o:%.asm
+	nasm -felf $< -o $@
 
 
 clean: 
-	rm -vf *.o *.bin *.obj
+	rm -vf *.o *.bin

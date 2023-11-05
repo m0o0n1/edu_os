@@ -127,10 +127,10 @@ _start:
     mov bx, kernel_load_offset
 
 
+    mov [previous_cluster], ax
 .load_kernel_loop:
     xor cx, cx
     sub ax, 2
-    mov [previous_cluster], ax
     add ax, [data_lba]
 
     mov cl, 1
@@ -143,13 +143,16 @@ _start:
     mov bx, [fat_address]
     mov cx, [previous_cluster]
     shl cx, 1
-    add cx, 4
     add bx, cx
     mov ax, [bx]
+    mov [previous_cluster], ax
+
     pop bx
 
-    cmp ax, 0xFFFE     
-    jg .loaded
+    push ax
+    xor ax, 0xFFFF     
+    pop ax
+    jz .loaded
     
     jmp .load_kernel_loop
 
@@ -158,9 +161,7 @@ _start:
     mov es, dx
     mov ds, dx
 
-
     jmp kernel_load_segment:kernel_load_offset
-
     nop
     nop
     nop
@@ -241,7 +242,7 @@ error_msg:  db "There was an error. Check your drive and press a key to reboot."
 sys_files: db "KERNEL  BIN"
 previous_cluster: dw 0x0000
 
-kernel_load_segment equ 0x2000
+kernel_load_segment equ 0x800
 kernel_load_offset  equ 0
 times 510 - ($ - $$) db 0x00
 dw 0xaa55

@@ -1,40 +1,27 @@
-ENTRY(_start)
- 
-/* Tell where the various sections of the object files will be put in the final
-   kernel image. */
+ENTRY(_start_pre_main)
+OUTPUT_FORMAT(binary)
+OUTPUT(kernel.bin)
+
 SECTIONS
 {
-	/* Begin putting sections at 1 MiB, a conventional place for kernels to be
-	   loaded at by the bootloader. */
-	. = 64K;
- 
-	/* First put the multiboot header, as it is required to be put very early
-	   early in the image or the bootloader won't recognize the file format.
-	   Next we'll put the .text section. */
-	.text BLOCK(4K) : ALIGN(4K)
-	{
-		*(.text)
-	}
- 
-	/* Read-only data. */
-	.rodata BLOCK(4K) : ALIGN(4K)
-	{
-		*(.rodata)
-	}
- 
-	/* Read-write data (initialized) */
-	.data BLOCK(4K) : ALIGN(4K)
-	{
-		*(.data)
-	}
- 
-	/* Read-write data (uninitialized) and stack */
-	.bss BLOCK(4K) : ALIGN(4K)
-	{
-		*(COMMON)
-		*(.bss)
-	}
- 
-	/* The compiler may produce other sections, by default it will put them in
-	   a segment with the same name. Simply add stuff here as needed. */
+    . = 0x10000;
+    .text.start(0x10000) : {
+        kernel_asm.o(.text)
+    }
+    .text : ALIGN(4K) {
+        _TEXT_START_ = .;
+        *(.text)
+        _TEXT_END_ = .;
+    }
+    .data : ALIGN(4K) {
+        _DATA_START_ = .;
+        *(.data)
+        _DATA_END_ = .;
+    }
+
+  .bss : ALIGN(4K) {
+        _BSS_START_ = .;
+        *(.bss)
+        _BSS_END_ = .;
+    }
 }
