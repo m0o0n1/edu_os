@@ -35,3 +35,4 @@ gdb:
 
 clean:
 	find $(BUILDDIR)/ ! -name $(TARGET) -type f -exec rm -f {} +
+	cd $(KERNEL_SRC_DIR); make clean
