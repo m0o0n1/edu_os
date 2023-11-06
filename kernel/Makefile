@@ -10,7 +10,7 @@ LD=i686-elf-ld
 TARGET=kernel.bin
 OBJS=kernel.o kernel_asm.o
 
-all: $(OBJS) $(LD_SCRIPT) clean
+all: $(OBJS) $(LD_SCRIPT)
 	$(LD) -T $(LD_SCRIPT) -o $(BUILDDIR)/$(TARGET) -nostdlib $(OBJS)
 
 %.o:%.c
