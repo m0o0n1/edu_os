@@ -2,6 +2,8 @@ ENTRY(_start_pre_main)
 OUTPUT_FORMAT(binary)
 OUTPUT(kernel.bin)
 
+SEARCH_DIR(terminal)
+
 SECTIONS
 {
     . = 0x10000;

@@ -55,7 +55,7 @@ _start:
     mov ah, 013h
     mov al, 01h 
     xor bx, bx
-    mov cx, 12
+    mov cx, 6
     xor dx, dx
     mov bp, boot_msg
     int 010h
@@ -157,18 +157,16 @@ _start:
     jmp .load_kernel_loop
 
 .loaded:
-    mov dx, kernel_load_segment
-    mov es, dx
-    mov ds, dx
+    mov ax, 00003h
+    int 010h
 
-    jmp kernel_load_segment:kernel_load_offset
-    nop
-    nop
-    nop
-    nop
-    nop
+    cli
+    lgdt [GDT_DESCRIPTOR]
+    mov eax, cr0
+    or eax, 0x1
+    mov cr0, eax                ;; probably need an sti
 
-    jmp error_happened
+    jmp CODE_SEG:go_protected
 
 ; in
 ;   ax - lba
@@ -235,14 +233,62 @@ error_happened:
 
     jmp 0ffffh:00h
 
+
 fat_address: dw 0x500
 rd_address: dw 0x7e00
-boot_msg: db "Booting...", 0x0a, 0x0d
-error_msg:  db "There was an error. Check your drive and press a key to reboot."
+boot_msg: db "Boot", 0x0a, 0x0d
+error_msg:  db "[ERROR]. Press a key to reboot."
 sys_files: db "KERNEL  BIN"
 previous_cluster: dw 0x0000
 
-kernel_load_segment equ 0x800
+kernel_load_segment equ 0x1000
 kernel_load_offset  equ 0
+
+GDT_START:
+null_descriptor:
+    dd 0
+    dd 0
+code_descriptor:
+    dw 0xffff
+    dw 0
+    db 0
+    db 0b10011010
+    db 0b11001111
+    db 0
+data_descriptor:
+    dw 0xffff
+    dw 0
+    db 0
+    db 0b10010010
+    db 0b11001111
+    db 0
+GDT_END:
+
+GDT_DESCRIPTOR:
+    dw GDT_END - GDT_START - 1
+    dd GDT_START
+CODE_SEG equ code_descriptor - GDT_START
+DATA_SEG equ data_descriptor - GDT_START
+
+[bits 32]
+go_protected:
+    mov ax, DATA_SEG
+    mov ds, ax
+    mov ss, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+    mov ebp, 0x90000
+    mov esp, ebp
+
+    jmp 0x10000 ; kostbIl' 
+    jmp $ ; should never happen
+
 times 510 - ($ - $$) db 0x00
 dw 0xaa55
+
+
+
+
+
+
