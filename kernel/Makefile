@@ -8,9 +8,9 @@ CC_FLAGS=-ffreestanding -O2 -Wall -Wextra
 LD=i686-elf-ld
 
 TARGET=kernel.bin
-OBJS=kernel.o kernel_asm.o
+OBJS=kernel.o kernel_asm.o string.o terminal.o
 
-all: $(OBJS) $(LD_SCRIPT) clean
+all: $(OBJS) $(LD_SCRIPT)
 	$(LD) -T $(LD_SCRIPT) -o $(BUILDDIR)/$(TARGET) -nostdlib $(OBJS)
 
 %.o:%.c
