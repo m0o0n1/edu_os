@@ -10,7 +10,13 @@ CC=i686-elf-gcc
 
 FS=mkfs.fat
 FS_FLAGS=-s 1 -S 512 -F 16
-all: $(BUILDDIR)/$(TARGET) clean
+all: always $(BUILDDIR)/$(TARGET) clean
+
+always:
+ifeq ($(wildcard $(BUILDDIR)),)
+	mkdir $(BUILDDIR)
+endif
+
 
 $(BUILDDIR)/$(TARGET): $(BUILDDIR)/bootloader.bin $(BUILDDIR)/kernel.bin
 	dd if=/dev/zero of=$(BUILDDIR)/$(TARGET) bs=512 count=5900
