@@ -1,11 +1,22 @@
-all: kernel.o kernel_asm.o
-	../../cross-compile/cross/bin/i686-elf-ld -T linker.ld -o kernel.bin -nostdlib kernel.o kernel_asm.o
+K_DIR=$(realpath $(CURDIR))
+BUILDDIR?=build
+
+ASM?=nasm
+LD_SCRIPT=$(K_DIR)/linker.ld
+CC=i686-elf-gcc
+CC_FLAGS=-ffreestanding -O2 -Wall -Wextra
+LD=i686-elf-ld
+
+TARGET=kernel.bin
+OBJS=kernel.o kernel_asm.o
+
+all: $(OBJS) $(LD_SCRIPT) clean
+	$(LD) -T $(LD_SCRIPT) -o $(BUILDDIR)/$(TARGET) -nostdlib $(OBJS)
 
 %.o:%.c
-	../../cross-compile/cross/bin/i686-elf-gcc -c $< -ffreestanding -O2 -Wall -Wextra
+	$(CC) -c $< $(CC_FLAGS)
 %.o:%.asm
-	nasm -felf $< -o $@
+	$(ASM) -felf $< -o $@
 
-
-clean: 
-	rm -vf *.o *.bin
+clean:
+	rm -vf *.o
